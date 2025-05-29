@@ -22,8 +22,18 @@ model booking{
   bookingAmout Int
   status bookingStatus
   totalGuest Int @default(1)
-  
+  idempotencyKey idempotencyKey? //stores the id --- idempotencyKey_id 
 }
+
+model idempotencyKey{
+  id Int @id @default(autoincrement())
+  idemKey String @unique 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  bookingId Int? @unique
+  booking booking? @relation(fields: [bookingId], references: [id]) 
+}
+
 enum bookingStatus {
   PEDNING
   CANCELLED
