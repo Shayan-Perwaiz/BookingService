@@ -66,10 +66,10 @@ export async function cancelBooking(bookingId: number) {
   return booking;
 }
 
-export async function finalizeBooking(bookingId: number) {
+export async function finalizeBooking(key: string) {
   const booking = await prismaClient.idempotencyKey.update({
     where: {
-      id: bookingId,
+      idemKey: key,
     },
     data: {
       finalized: true,
