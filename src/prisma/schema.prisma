@@ -30,6 +30,7 @@ model idempotencyKey{
   idemKey String @unique 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  finalized Boolean
   bookingId Int? @unique
   booking booking? @relation(fields: [bookingId], references: [id]) 
 }
