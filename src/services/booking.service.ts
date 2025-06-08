@@ -1,3 +1,4 @@
+import prisma from "../prisma/client";
 import {
   confirmBooking,
   createBooking,
@@ -29,17 +30,19 @@ export async function createBookingService(
 }
 
 export async function finalizeBookingService(idempotencyKey: string) {
-  const idempotencyKeyData = await getIdempotencykey(idempotencyKey);
-  if (!idempotencyKeyData) {
-    throw new NotFoundError("Idempotency Key not found");
-  }
+  return await prisma.$transaction(async (txn) => {
+    const idempotencyKeyData = await getIdempotencykey(txn, idempotencyKey);
+    if (!idempotencyKeyData) {
+      throw new NotFoundError("Idempotency Key not found");
+    }
 
-  if (idempotencyKeyData.finalized) {
-    throw new BadRequestError("Idempotency key already finalized");
-  }
+    if (idempotencyKeyData.finalized) {
+      throw new BadRequestError("Idempotency key already finalized");
+    }
 
-  const booking = await confirmBooking(idempotencyKeyData.bookingId);
-  await finalizeIdempotencyKey(idempotencyKey);
+    const booking = await confirmBooking(txn, idempotencyKeyData.bookingId);
+    await finalizeIdempotencyKey(txn, idempotencyKey);
 
-  return booking;
+    return booking;
+  });
 }
