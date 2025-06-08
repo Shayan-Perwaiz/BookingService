@@ -1,3 +1,4 @@
+import { createBookingDTO } from "../dto/booking.dto";
 import prisma from "../prisma/client";
 import {
   confirmBooking,
@@ -9,17 +10,12 @@ import {
 import { BadRequestError, NotFoundError } from "../utils/errors/app.error";
 import { generateIdempotecyKey } from "../utils/helpers/idempotencyKey";
 
-export async function createBookingService(
-  userId: number,
-  hotelId: number,
-  bookingAmount: number,
-  totalGuest: number
-) {
+export async function createBookingService(createBookingDto: createBookingDTO) {
   const booking = await createBooking({
-    userId,
-    hotelId,
-    bookingAmount: bookingAmount,
-    totalGuest: totalGuest,
+    userId: createBookingDto.userId,
+    hotelId: createBookingDto.hotelId,
+    bookingAmount: createBookingDto.bookingAmount,
+    totalGuest: createBookingDto.totalGuest,
   });
 
   const idempotencyKey = generateIdempotecyKey();
